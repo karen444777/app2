@@ -26,14 +26,25 @@ class _HomeState extends State<Home> {
   // Lista de personas
   List<Persona> _persona = [
     Persona('Feid', 'González', '20191907'),
-    Persona('Karen', 'González', '20195579'),
+    Persona('Janet', 'Mancilla', '2019300603'),
+    Persona('Karen', 'González', '20190701'),
+    
   ];
 
-  // Función para agregar una persona
-  void _agregarPersona() {
-    setState(() {
-      _persona.add(Persona('Nuevo', 'Alumno', '00000000')); // Agrega la misma persona por ahora
-    });
+  // Función para abrir la pantalla de agregar persona
+  void _agregarPersona() async {
+    final nuevaPersona = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AgregarPersona(),
+      ),
+    );
+
+    if (nuevaPersona != null) {
+      setState(() {
+        _persona.add(nuevaPersona); // Agregar la persona nueva a la lista
+      });
+    }
   }
 
   // Función para borrar una persona
@@ -50,12 +61,12 @@ class _HomeState extends State<Home> {
         title: const Text(
           'Listado de alumnos',
           style: TextStyle(
-            color: Colors.purple,
+            color: Colors.black, // Color del texto negro
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blue, // Color de fondo azul
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
@@ -89,10 +100,109 @@ class _HomeState extends State<Home> {
   }
 }
 
+// Clase Persona
 class Persona {
   String nombre;
   String apellido;
   String cuenta;
 
   Persona(this.nombre, this.apellido, this.cuenta);
+}
+
+// Pantalla para agregar una nueva persona
+class AgregarPersona extends StatefulWidget {
+  @override
+  _AgregarPersonaState createState() => _AgregarPersonaState();
+}
+
+class _AgregarPersonaState extends State<AgregarPersona> {
+  final _formKey = GlobalKey<FormState>();
+
+  String _nombre = '';
+  String _apellido = '';
+  String _cuenta = '';
+
+  // Función para manejar el envío del formulario
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      final nuevaPersona = Persona(_nombre, _apellido, _cuenta);
+      Navigator.of(context).pop(nuevaPersona); // Regresamos la nueva persona a la pantalla anterior
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Agregar nuevo alumno'),
+        backgroundColor: Colors.purple, // Color de fondo
+      ),
+      body: Container(
+        color: const Color.fromARGB(255, 252, 251, 252), // Fondo morado claro
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Nombre',
+                  labelStyle: TextStyle(color: Colors.black), // Texto en negro
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Por favor ingresa el nombre';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _nombre = value!;
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Apellido',
+                  labelStyle: TextStyle(color: Colors.black), // Texto en negro
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Por favor ingresa el apellido';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _apellido = value!;
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Número de cuenta',
+                  labelStyle: TextStyle(color: Colors.black), // Texto en negro
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Por favor ingresa el número de cuenta';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _cuenta = value!;
+                },
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _submitForm,
+                child: Text('Agregar'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 255, 255, 255), 
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
